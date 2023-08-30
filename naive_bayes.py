@@ -3,6 +3,7 @@ from sklearn.model_selection import train_test_split
 from sklearn import datasets
 
 class NaiveBayes:
+
     def fit(self, X, y):
         n_samples, n_features = X.shape
         self._classes = np.unique(y)
@@ -19,10 +20,13 @@ class NaiveBayes:
             self._var[idx, :] = X_c.var(axis=0)
             self._priors[idx] = X_c.shape[0] / float(n_samples)
 
-    def predict(self, X):
-        y_pred = [self._predict(x) for x in X]
-        return np.array(y_pred)
-
+    def _pdf(self, class_idx, x):
+        mean = self._mean[class_idx]
+        var = self._var[class_idx]
+        numerator = np.exp(-((x - mean) ** 2) / (2 * var))
+        denominator = np.sqrt(2 * np.pi * var)
+        return numerator / denominator
+    
     def _predict(self, x):
         posteriors = []
 
@@ -36,23 +40,21 @@ class NaiveBayes:
         # return class with highest posterior probability
         return self._classes[np.argmax(posteriors)]
 
-    def _pdf(self, class_idx, x):
-        mean = self._mean[class_idx]
-        var = self._var[class_idx]
-        numerator = np.exp(-((x - mean) ** 2) / (2 * var))
-        denominator = np.sqrt(2 * np.pi * var)
-        return numerator / denominator
-    
-if __name__ == '__main__':
-    def accuracy(y_true, y_pred):
-        accuracy = np.sum(y_true == y_pred) / len(y_true)
-        return accuracy
+    def predict(self, X):
+        y_pred = [self._predict(x) for x in X]
+        return np.array(y_pred)
 
-    X, y = datasets.make_classification(n_samples=1000, n_features=10, n_classes=2, random_state=123)
-    X_train, X_test, y_train_, y_test = train_test_split(X, y, test_size=0.2, random_state=123)
+# Driver Code
+# if __name__ == '__main__':
+#     def accuracy(y_true, y_pred):
+#         accuracy = np.sum(y_true == y_pred) / len(y_true)
+#         return accuracy
 
-    nb = NaiveBayes()
-    nb.fit(X_train, y_train_)
-    predictions = nb.predict(X_test)
+#     X, y = datasets.make_classification(n_samples=1000, n_features=10, n_classes=2, random_state=123)
+#     X_train, X_test, y_train_, y_test = train_test_split(X, y, test_size=0.2, random_state=123)
 
-    print("Naive Bayes classification accuracy", accuracy(y_test, predictions))
+#     nb = NaiveBayes()
+#     nb.fit(X_train, y_train_)
+#     predictions = nb.predict(X_test)
+
+#     print("Naive Bayes classification accuracy", accuracy(y_test, predictions))
