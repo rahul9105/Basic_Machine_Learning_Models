@@ -1,5 +1,5 @@
 # Basic_Machine_Learning_Models
-Basic Machine Learning Models - Updated
+Basic Machine Learning Models
 
 1. KNN
 2. Linear Regression
